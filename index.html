@@ -28,14 +28,14 @@
 <body>
   <fieldset>
     <legend>Error Calculator</legend>
-    <input type="number" name="first-num" id="first-num" />
+    <input name="first-num" id="first-num" />
     <select name="operator" id="operator">
       <option>+</option>
       <option>-</option>
       <option>*</option>
       <option>/</option>
     </select>
-    <input type="number" name="second-num" id="second-num" />
+    <input name="second-num" id="second-num" />
     <button id="calculate">Calculate</button>
     <br />
     <output></output>
@@ -55,18 +55,112 @@
     <button>Trigger a Global Error</button>
   </section>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "fb45e10eb7374e17a1318fd918e67119"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+
+                        
     let calculateBtn = document.querySelector('#calculate');
     calculateBtn.addEventListener('click', () => {
       let output = document.querySelector('output');
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try {
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      }
+      catch (err) {
+        err.message = "Value converted to NaN";
+        console.log("Sadly an error happened friend");
+        console.error(err);
+      }
+      finally {
+        console.log("Executed.");
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
+    
     // TODO - Make buttons functional
+    let consoleLog = errorBtns[0];
+    consoleLog.addEventListener('click', () => {
+      console.log("I am clicked!");
+                        
+    })
+
+    let consoleError = errorBtns[1];
+    consoleError.addEventListener('click', () => {
+      console.error("I am error!");
+    })
+
+    let consoleDir = errorBtns[2];
+    consoleDir.addEventListener('click', () => {
+      console.dir(errorBtns[2]);
+    })
+
+    let consoleDirXml = errorBtns[3];
+    consoleDirXml.addEventListener('click', () => {
+      console.dirxml(document.body);
+    })
+
+    let consoleGroupStart = errorBtns[4];
+    consoleGroupStart.addEventListener('click', () => {
+      console.group('TheGroup');
+    })
+
+    let consoleGroupEnd = errorBtns[5];
+    consoleGroupEnd.addEventListener('click', () => {
+      console.groupEnd('TheGroup');
+    })
+
+    let consoleTable = errorBtns[6];
+    consoleTable.addEventListener('click', () => {
+      console.table([ {name: 'Grady',num: '10'}, {name: 'Terence',num: '11'}, {name: 'Marco',num: '12'} ]);
+    })
+
+    let consoleStartTime = errorBtns[7];
+    consoleStartTime.addEventListener('click', () => {
+      console.time();
+    })
+
+    let consoleEndTime = errorBtns[8];
+    consoleEndTime.addEventListener('click', () => {
+      console.timeEnd();
+    })
+    
+    let consoleTrace = errorBtns[9];
+    consoleTrace.addEventListener('click', () => {
+      const traceTest = () => { deep(); };
+      const deep = () => { deeper(); };
+      const deeper = () => { deepest(); };
+      const deepest = () => { console.trace(); };
+      traceTest();
+    })
+
+    class MyError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "CustomError";
+      }
+    }
+
+    let consoleTriggerGlobal = errorBtns[10];
+    consoleTriggerGlobal.addEventListener('click', () => {
+     try {
+      throw new MyError("My Error!!!")
+     } catch(err) {
+       console.log("This is Error!")
+       console.error(err);
+     }
+    })
+
+    window.onerror = function(message, source, lineno, colno, error) {
+      TrackJS.track(error);
+    }
+
   </script>
 </body>
 </html>
